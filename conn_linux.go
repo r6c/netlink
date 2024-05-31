@@ -6,6 +6,7 @@ package netlink
 import (
 	"context"
 	"os"
+	"sync"
 	"syscall"
 	"time"
 	"unsafe"
@@ -20,6 +21,12 @@ var _ Socket = &conn{}
 // A conn is the Linux implementation of a netlink sockets connection.
 type conn struct {
 	s *socket.Conn
+}
+
+var bufferPool = sync.Pool{
+	New: func() interface{} {
+		return make([]byte, 32768) // 默认大小为 32KB
+	},
 }
 
 // dial is the entry point for Dial. dial opens a netlink socket using
@@ -121,28 +128,24 @@ func (c *conn) Send(m Message) error {
 
 // Receive receives one or more Messages from netlink.
 func (c *conn) Receive() ([]Message, error) {
-	b := make([]byte, os.Getpagesize())
-	for {
-		// Peek at the buffer to see how many bytes are available.
-		//
-		// TODO(mdlayher): deal with OOB message data if available, such as
-		// when PacketInfo ConnOption is true.
-		n, _, _, _, err := c.s.Recvmsg(context.Background(), b, nil, unix.MSG_PEEK)
-		if err != nil {
-			return nil, err
-		}
+	b := bufferPool.Get().([]byte)
+	defer bufferPool.Put(b)
 
-		// Break when we can read all messages
-		if n < len(b) {
-			break
-		}
+	// Peek at the buffer to see how many bytes are available.
+	//
+	// TODO(mdlayher): deal with OOB message data if available, such as
+	// when PacketInfo ConnOption is true.
+	n, _, _, _, err := c.s.Recvmsg(context.Background(), b[:0], nil, unix.MSG_PEEK|unix.MSG_TRUNC)
+	if err != nil {
+		return nil, err
+	}
 
-		// Double in size if not enough bytes
-		b = make([]byte, len(b)*2)
+	if n > len(b) {
+		b = make([]byte, n) // 如果需要的缓冲区大于默认大小，重新分配
 	}
 
 	// Read out all available messages
-	n, _, _, _, err := c.s.Recvmsg(context.Background(), b, nil, 0)
+	n, _, _, _, err = c.s.Recvmsg(context.Background(), b[:n], nil, 0)
 	if err != nil {
 		return nil, err
 	}
