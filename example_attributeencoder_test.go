@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/mdlayher/netlink"
+	"github.com/r6c/netlink"
 )
 
 // encodeNested is a nested structure within out.

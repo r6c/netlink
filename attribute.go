@@ -7,7 +7,7 @@ import (
 	"math"
 
 	"github.com/josharian/native"
-	"github.com/mdlayher/netlink/nlenc"
+	"github.com/r6c/netlink/nlenc"
 )
 
 // errInvalidAttribute specifies if an Attribute's length is incorrect.

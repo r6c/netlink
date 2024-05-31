@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/mdlayher/netlink"
-	"github.com/mdlayher/netlink/nltest"
+	"github.com/r6c/netlink"
+	"github.com/r6c/netlink/nltest"
 	"golang.org/x/sys/unix"
 )
 

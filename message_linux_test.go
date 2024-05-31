@@ -9,7 +9,7 @@ import (
 	"unsafe"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/mdlayher/netlink/nlenc"
+	"github.com/r6c/netlink/nlenc"
 	"golang.org/x/sys/unix"
 )
 

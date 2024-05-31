@@ -10,8 +10,8 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/josharian/native"
-	"github.com/mdlayher/netlink"
-	"github.com/mdlayher/netlink/nltest"
+	"github.com/r6c/netlink"
+	"github.com/r6c/netlink/nltest"
 )
 
 func TestConnSend(t *testing.T) {

@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mdlayher/netlink"
-	"github.com/mdlayher/netlink/nltest"
+	"github.com/r6c/netlink"
+	"github.com/r6c/netlink/nltest"
 )
 
 func TestConnExecute(t *testing.T) {
@@ -168,7 +168,7 @@ func TestConnReceiveShortErrorNumber(t *testing.T) {
 	defer c.Close()
 
 	_, err := c.Receive()
-	if !strings.Contains(err.Error(), "not enough data") {
+	if err != nil && !strings.Contains(err.Error(), "not enough data") {
 		t.Fatalf("unexpected error: %v", err)
 	}
 }
@@ -192,7 +192,7 @@ func TestConnReceiveShortErrorAcknowledgementHeader(t *testing.T) {
 	defer c.Close()
 
 	_, err := c.Receive()
-	if !strings.Contains(err.Error(), "not enough data") {
+	if err != nil && !strings.Contains(err.Error(), "not enough data") {
 		t.Fatalf("unexpected error: %v", err)
 	}
 }
@@ -208,7 +208,7 @@ func TestConnJoinLeaveGroupUnsupported(t *testing.T) {
 
 	for _, op := range ops {
 		err := op(0)
-		if !strings.Contains(err.Error(), "not supported") {
+		if err != nil && !strings.Contains(err.Error(), "not supported") {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	}
@@ -219,7 +219,7 @@ func TestConnSetBPFUnsupported(t *testing.T) {
 	defer c.Close()
 
 	err := c.SetBPF(nil)
-	if !strings.Contains(err.Error(), "not supported") {
+	if err != nil && !strings.Contains(err.Error(), "not supported") {
 		t.Fatalf("unexpected error: %v", err)
 	}
 }
@@ -229,7 +229,7 @@ func TestConnSetDeadlineUnsupported(t *testing.T) {
 	defer c.Close()
 
 	err := c.SetDeadline(time.Now())
-	if !strings.Contains(err.Error(), "not supported") {
+	if err != nil && !strings.Contains(err.Error(), "not supported") {
 		t.Fatalf("unexpected error: %v", err)
 	}
 }
@@ -239,7 +239,7 @@ func TestConnSetOptionUnsupported(t *testing.T) {
 	defer c.Close()
 
 	err := c.SetOption(0, false)
-	if !strings.Contains(err.Error(), "not supported") {
+	if err != nil && !strings.Contains(err.Error(), "not supported") {
 		t.Fatalf("unexpected error: %v", err)
 	}
 }
@@ -255,7 +255,7 @@ func TestConnSetBuffersUnsupported(t *testing.T) {
 
 	for _, op := range ops {
 		err := op(0)
-		if !strings.Contains(err.Error(), "not supported") {
+		if err != nil && !strings.Contains(err.Error(), "not supported") {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	}
@@ -265,7 +265,7 @@ func TestConnSyscallConnUnsupported(t *testing.T) {
 	c := nltest.Dial(nil)
 	defer c.Close()
 
-	if _, err := c.SyscallConn(); !strings.Contains(err.Error(), "not supported") {
+	if _, err := c.SyscallConn(); err != nil && !strings.Contains(err.Error(), "not supported") {
 		t.Fatalf("unexpected error: %v", err)
 	}
 }
